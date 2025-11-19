@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:80"  # Expose nginx on port 5173
+    environment:
+      VITE_API_URL: http://localhost:3000
+    depends_on:
+      - backend
+    command: ["nginx", "-g", "daemon off;"]  # Keep nginx running in foreground
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres.bemtyvykrfaeybfndwlf:SuDelkDB123@aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+      DIRECT_URL: postgresql://postgres.bemtyvykrfaeybfndwlf:SuDelkDB123@aws-1-ap-northeast-1.pooler.supabase.com:5432/postgres
+      PORT: 3000
+    command: sh -c "npx prisma generate && npm run start"
